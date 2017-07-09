@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<project name="ClojureShell" default="build" basedir=".">
+<project name="ClojureShell" default="package" basedir=".">
+	<property file="build.properties" />
 	<!-- mark:build.properties -->
-	<property file="../../build.properties" />
+	<!-- <property file="../../build.properties" /> -->
 	<!-- /mark:build.properties -->
-	<!-- <property file="build.properties" /> -->
 	<!-- <property file="../build.properties" /> -->
 	<property name="compiler.source" value="1.5" />
 	<property name="compiler.target" value="1.5" />
@@ -14,6 +14,7 @@
 	xsltproc: if you plan on using docbook
 	-->
 	<property name="docs-proc.target" value="xsltproc" />
+	<property name="plugin.version" value="1.0.2" />
 	
 	<!-- jEdit installation properties. -->
 	<!-- mark:properties -->
@@ -22,8 +23,10 @@
 	
 	<!-- If you want any extra files to be included with your plugin's jar,
 	such as custom images, you need to specify them here. -->
+	<!--
 	<selector id="packageFiles">
 	</selector>
+	-->
 	
 	<!-- Add your plugin's specific dependencies here -->
 	<path id="project.class.path">
