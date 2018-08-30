@@ -1,51 +1,165 @@
 <?xml version="1.0" ?>
 <project name="ClojureShell" default="package" basedir=".">
+
+	<!--
+	conditional on the operating system
+	https://alvinalexander.com/blog/post/java/how-conditional-operation-ant-script-operating-system
+	-->
+	<!-- <echo message="${os.name}" /> -->
+	<condition property="os.nickname" value="win">
+		<os family="windows" />
+	</condition>
+	<condition property="os.nickname" value="lin">
+		<os family="unix" />
+	</condition>
+	<condition property="os.nickname" value="mac">
+		<os family="mac" />
+	</condition>
+	<!-- <echo message="os nickname is ${os.nickname}"/> -->
+
+	<property file="build-${os.nickname}.properties" />
+	<!--
 	<property file="build.properties" />
-	<!-- mark:build.properties -->
-	<!-- <property file="../../build.properties" /> -->
-	<!-- /mark:build.properties -->
-	<!-- <property file="../build.properties" /> -->
-	<property name="compiler.source" value="1.5" />
-	<property name="compiler.target" value="1.5" />
+	<property file="../build.properties" />
+	-->
+
+	<property name="compiler.source" value="1.8" />
+	<property name="compiler.target" value="1.8" />
 	<property name="src.dir" value="src" />
-	
+
+	<!-- the directory for the compiled classes. Files in this directory
+	will be included in the finished jar file. -->
+	<property name="classes.dir" location="classes" />
+	<!-- class name for 'main' to run as application -->
+	<!-- <property name="main.class" value="..."/> -->
+
 	<!-- Documentation process
 	none: if you supply your own html file as this template does.
 	xsltproc: if you plan on using docbook
 	-->
 	<property name="docs-proc.target" value="xsltproc" />
-	<property name="plugin.version" value="1.0.2" />
-	
+	<property name="plugin.version" value="1.0.0" />
+
 	<!-- jEdit installation properties. -->
-	<!-- mark:properties -->
-	<!-- /mark:properties -->
+	<!-- already defined in build.properties:
+	<property name="build.support" value="build-support" />
+	-->
 	<import file="${build.support}/plugin-build.xml" />
-	
+
+	<!-- custom: -->
+	<property name="jedit.plugins.dir" value="${jedit.install.dir}/jars"/>
+	<property name="jedit.user.plugins.dir" value="${jedit.user.home}/jars"/>
+
+	<!--
+	This selector defines the files that will be
+	compiled by the "compile" target. Define here which
+	files under ${src.dir} will be compiled when the
+	"compile" task is called.
+	<selector id="compileFiles">
+		<filename name="*.java" />
+	</selector>
+	-->
+
 	<!-- If you want any extra files to be included with your plugin's jar,
 	such as custom images, you need to specify them here. -->
 	<!--
 	<selector id="packageFiles">
+		<and>
+			<or>
+			</or>
+		</and>
 	</selector>
 	-->
-	
+
+	<!--
+	<selector id="docsFiles">
+		<and>
+			<filename name="*.xml" />
+		</and>
+	</selector>
+	-->
+
+	<selector id="extraFiles">
+		<and>
+			<or>
+				<filename name="*.props" />
+				<filename name="*.xml" />
+			</or>
+			<not>
+				<filename name="build.xml" />
+			</not>
+		</and>
+	</selector>
+
 	<!-- Add your plugin's specific dependencies here -->
 	<path id="project.class.path">
 		<!-- Dependencies that are bundled with your plugin.
-		These should also be represented in your props file under the, 
+		These should also be represented in your props file under the,
 		"plugin.[plugin class].jars" property. -->
 		<!-- <pathelement path="lib/dependency.jar" /> -->
-		<!-- mark:libs -->
-	<!-- /mark:libs -->
-		
+
 		<!-- Dependencies that are supplied by other plugins. -->
 		<!-- <pathelement path="${jedit.plugins.dir}/dependency.jar" /> -->
-		<!-- mark:plugins -->
-	<pathelement path="${jedit.plugins.dir}/Console.jar" />
-	<pathelement path="${jedit.plugins.dir}/ProcessShell.jar" />
-	<pathelement path="${jedit.plugins.dir}/Clojure.jar" />
-	<pathelement path="${jedit.plugins.dir}/Classpath.jar" />
-	<!-- /mark:plugins -->
+		<pathelement path="${jedit.plugins.dir}/Console.jar" />
+		<pathelement path="${jedit.plugins.dir}/ProcessShell.jar" />
+		<pathelement path="${jedit.plugins.dir}/Clojure.jar" />
+		<pathelement path="${jedit.plugins.dir}/Classpath.jar" />
 	</path>
-	
+
+	<!-- Copy over required dependencies to install.dir -->
+	<!--
+	<target name="build.prepare">
+		
+		<copy todir="${install.dir}">
+			<fileset dir="lib">
+				<filename name="*.jar"/>
+			</fileset>
+		</copy>
+	</target>
+	-->
+
+	<!-- =====================================
+	Builds the plugin JAR file (inluding docs)
+	====================================== -->
+	<!--
+	<target name="build"
+			depends="build.prepare,compile"
+			description="Builds the plugin JAR file (no docs)">
+
+		<mkdir dir="${build.classes}" />
+		<delete dir="${build.docs}" failonerror="false" />
+		<mkdir dir="${build.docs}" />
+		<delete dir="${build.extras}" failonerror="false" />
+		<mkdir dir="${build.extras}" />
+		<mkdir dir="${install.dir}" />
+
+		<copy todir="${build.docs}" includeEmptyDirs="false">
+			<fileset dir="${basedir}/docs">
+				<selector refid="docsFiles" />
+			</fileset>
+		</copy>
+
+		<copy todir="${build.extras}" includeEmptyDirs="false">
+			<fileset dir="${basedir}">
+				<selector refid="extraFiles" />
+			</fileset>
+		</copy>
+
+		<jar jarfile="${install.dir}/${jar.file}">
+			<fileset dir="${build.classes}" />
+			<fileset dir="${build.docs}" />
+			<fileset dir="${build.extras}" />
+		</jar>
+
+		<antcall target="build.post" />
+
+	</target>
+	-->
+
 </project>
 <!-- ::mode=xml:: -->
+
+<!--
+d:\tools\apache-ant-1.9.7\bin\ant.bat
+d:\tools\apache-ant-1.10.3\bin\ant.bat
+-->
