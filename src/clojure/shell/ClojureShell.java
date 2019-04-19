@@ -56,7 +56,8 @@ public class ClojureShell extends ProcessShell {
 	 * Evaluate text
 	 */
 	public void eval(Console console, String str) {
-		String cmd = "(load-string \""+str.replace("\"", "\\\"")+"\")";
+		//String cmd = "(load-string \""+str.replace("\"", "\\\"")+"\")";
+		String cmd = str;
 		send(console, cmd);
 	} //}}}
 
